@@ -7,42 +7,23 @@
 """
 import os
 import importlib
+from pathlib import Path
 from inspect import getmembers
 
 
 class FileFilter(object):
-    def get_all_py_files(self, path):
-        py_files = []
-        project = os.path.abspath(path)
-
-        print(self.find_py_files(project, py_files))
-
-    def find_py_files(self, base, py_files):
-        # if os.path.isdir(base):
-        # todo 遍历并递归文件夹
-        sub = os.listdir(base)
-        py_files += self._find_py_files_in_current_dir(sub, py_files)
-
-        sub_dir = list(filter(lambda x: os.path.isdir(os.path.join(base, x)), sub))
-        # print(sub_dir)
-        if sub_dir:
-            for _sub_dir in sub_dir:
-                self.find_py_files(os.path.join(base, _sub_dir), py_files)
-        # return self._find_py_files_in_current_dir(base, sub)
-
-    def _find_py_files_in_current_dir(self, base, files):
-        files = self.filter_py_file_names(files)
-        py_files = self.complete_py_file_path(base, files)
+    def get_all_py_files(self, path, to_string=True):
+        p = Path(path)
+        py_files = p.glob("**/*.py")
+        if to_string:
+            py_files = list(map(str, py_files))
         return py_files
 
-    def filter_py_file_names(self, files: list):
-        return list(filter(lambda x: x.endswith(".py"), files))
-
-    def complete_py_file_path(self, base: str, files: list):
-        return list(map(lambda x: os.path.join(base, x), files))
-
     def get_class_from_file(self, path):
-        pass
+        # todo 正则 or 导包
+        module = importlib.import_module(path)
+        print(module)
+        return module
 
     def get_func_from_file(self, path):
         pass
@@ -111,5 +92,7 @@ def replace(old, new, path, line_no):
 
 
 if __name__ == '__main__':
+    import sys
+    sys.path.append("/Users/baiwei/Desktop/stu/python_learn/sniff-code/tests")
     t = FileFilter()
-    t.get_all_py_files("./t1")
+    temp = t.get_class_from_file("/Users/baiwei/Desktop/stu/python_learn/sniff-code/tests")
